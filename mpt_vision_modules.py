@@ -65,10 +65,38 @@ def image_to_vector_module(image_size,*args):
 					self.os*=x.size()[i]
 			x=x.view(-1,self.os)		
 			return x
+			
+	class Convolution_MNIST_14(nn.Module):
+		'''
+		input size is 1x14x14 (MNIST)
+		output size is 
+		'''
+		def __init__(self):
+			nn.Module.__init__(self)
+			self.convol = nn.Sequential(
+            nn.BatchNorm2d(1),
+            nn.Conv2d(1, 8, kernel_size=5),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),
+            nn.BatchNorm2d(8),
+            nn.Conv2d(8, 10, kernel_size=3),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),
+			)
+			self.os=0
+
+		def forward(self,x):
+			x = self.convol(x)	
+			if (self.os==0):
+				self.os=1
+				for i in range(1,len(x.size())):
+					self.os*=x.size()[i]
+			x=x.view(-1,self.os)		
+			return x			
 
 	class Convolution_MNIST_56(nn.Module):
 		'''
-		input size is 1x28x28 (MNIST)
+		input size is 1x56x56 (MNIST)
 		output size is 10x3x3
 		'''
 		def __init__(self):
@@ -137,6 +165,8 @@ def image_to_vector_module(image_size,*args):
 	print(image_size)
 	if ((image_z==1) and (sx==28) and (sy==28)):
 		return Convolution_MNIST(),90
+	if ((image_z==1) and (sx==14) and (sy==14)):
+		return Convolution_MNIST_14(),10
 	if ((image_z==1) and (sx==56) and (sy==56)):
 		return Convolution_MNIST_56(),90
 	if ((image_z == 3) and (sx == 112) and (sy == 112)):

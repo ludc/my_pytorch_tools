@@ -122,6 +122,53 @@ def load_unsupervised_mnist(size_batches=64,sampling_rate=1.0):
 	logging.info("\t%d batches of size %d built"%(len(all_examples),size_batches))
 	return all_examples
 
+def transform_image_to_puzzle(image, nbx,nby):
+	'''
+	Transform an B*W*H image into a table of randomly shuffle pieces
+	'''
+	pieces=[]
+	sx=image.size()[1]/nbx
+	assert int(sx)==sx
+	sy=image.size()[2]/nby
+	assert sy==int(sy)
+	
+	for x in range(nbx):
+		for y in range(nby):
+			p=image.narrow(1,int(x*sx),int(sx)).narrow(2,int(y*sy),int(sy))
+			pieces.append(p)
+	
+	random.shuffle(pieces)
+	return(pieces)
+
+def load_puzzle_mnist(size_batches=64,sampling_rate=1.0,nb_pieces_x=1,nb_pieces_y=1):
+	'''	
+	'''
+	
+	logging.info("Creating mini-batches from MNIST PUZZLE")
+	loader = torch.utils.data.DataLoader(
+    datasets.MNIST(root='.', train=True, download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	
+	all_examples=[]	
+	for batch_idx, (data, target) in enumerate(loader):
+		if (random.random()<sampling_rate):
+			batch_pieces=None		
+			for i in range(data.size()[0]):			
+				pieces=transform_image_to_puzzle(data[0],nb_pieces_x,nb_pieces_y)
+				if (batch_pieces is None):					
+					batch_pieces=pieces[0].unsqueeze(0).unsqueeze(0).repeat(len(pieces),size_batches,1,1,1)
+				for k in range(len(pieces)):
+					batch_pieces[k][i]=pieces[k]
+			
+			all_examples.append((batch_pieces,data.clone()))
+
+	logging.info("\t%d batches of size %d built"%(len(all_examples),size_batches))
+	return all_examples
+
+
 
 def load_supervised_mnist(size_batches=64, sampling_rate=1.0):
 	'''
@@ -167,6 +214,34 @@ def load_unsupervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 				batch[i].narrow(1,px,28).narrow(2,py,28).copy_(data[i])				
 			
 			all_examples.append(batch)
+
+	logging.info("\t%d batches of size %d built"%(len(all_examples),size_batches))
+	return all_examples
+	
+def load_supervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
+	'''
+	Load batches of numbers from MNIST that are randomly localted in a  black 56x56 image
+	'''
+	
+	logging.info("Creating mini-batches from MNIST (digit random position)")
+	loader = torch.utils.data.DataLoader(
+    datasets.MNIST(root='.', train=True, download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	
+	all_examples=[]	
+	for batch_idx, (data, target) in enumerate(loader):
+		if (random.random()<sampling_rate):
+			batch=torch.zeros(data.size()[0],1,56,56)			
+			for i in range(data.size()[0]):			
+				px=random.randint(0,27)
+				py=random.randint(0,27)
+				batch[i].narrow(1,px,28).narrow(2,py,28).copy_(data[i])				
+				
+			
+			all_examples.append((batch,target.clone()))
 
 	logging.info("\t%d batches of size %d built"%(len(all_examples),size_batches))
 	return all_examples
