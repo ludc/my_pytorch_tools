@@ -159,7 +159,9 @@ def load_puzzle_mnist(size_batches=64,sampling_rate=1.0,nb_pieces_x=1,nb_pieces_
 			for i in range(data.size()[0]):			
 				pieces=transform_image_to_puzzle(data[0],nb_pieces_x,nb_pieces_y)
 				if (batch_pieces is None):					
-					batch_pieces=pieces[0].unsqueeze(0).unsqueeze(0).repeat(len(pieces),size_batches,1,1,1)
+					batch_pieces=[]
+					for p in pieces:
+						batch_pieces.append(p.unsqueeze(0).repeat(size_batches,1,1,1))
 				for k in range(len(pieces)):
 					batch_pieces[k][i]=pieces[k]
 			

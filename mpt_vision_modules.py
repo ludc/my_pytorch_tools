@@ -4,6 +4,25 @@ import torch.nn as nn
 import torch
 from torch.autograd import Function
 
+def inverse_batch_of_2x2matrices(A):
+	device=A.device
+	swap=torch.LongTensor([1,0]).to(device)
+	mask=torch.Tensor([[1,-1],[-1,1]]).to(device)
+	mask=mask.repeat(A.size()[0],1,1)
+			
+	A2=torch.index_select(A,1,swap)
+	A2=torch.index_select(A2,2,swap)
+	A2=A2.transpose(1,2)
+	A2=A2*mask
+	
+	mul=torch.bmm(A,A2)
+	mul2=torch.index_select(mul,1,swap)
+	mul=mul+mul2
+	mul=1.0/mul
+	Ainverse=mul*A2
+	return Ainverse
+
+
 def inverse_stn(stn_matrix):
 	'''
 	Get a Bx2x3 set of grids, and returns grids corresponding to the inverse transformation
@@ -12,11 +31,14 @@ def inverse_stn(stn_matrix):
 	'''
 	A=stn_matrix.narrow(2,0,2)
 	B=stn_matrix.narrow(2,2,1)
-	inverse_A = [t.inverse() for t in torch.functional.unbind(A)]
-	inverse_A = torch.stack(inverse_A, dim=0)
+	#inverse_A = [t.inverse() for t in torch.functional.unbind(A)]
+	#inverse_A = torch.stack(inverse_A, dim=0)
+	inverse_A=inverse_batch_of_2x2matrices(A)
 	inverse_AB = torch.bmm(inverse_A, B)
 	inverse_stn = torch.cat([inverse_A, -inverse_AB], dim=2)
 	return inverse_stn
+
+
 
 class GradReverse(Function):
     def __init__(self, lambd):
