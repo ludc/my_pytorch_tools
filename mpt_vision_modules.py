@@ -39,7 +39,6 @@ def inverse_stn(stn_matrix):
 	return inverse_stn
 
 
-
 class GradReverse(Function):
     def __init__(self, lambd):
         self.lambd = lambd
