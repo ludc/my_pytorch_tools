@@ -53,146 +53,6 @@ def grad_reverse(x, lambd=1.0):
     return GradReverse(lambd)(x)
 
 
-def image_to_vector_module(image_size,*args):
-	'''
-	Return a classical sequence of convolution+batchnorm aiming at transforming an image to a vector
-	@return module,size of the output vectors
-	'''
-
-	class Convolution_MNIST(nn.Module):
-		'''
-		input size is 1x28x28 (MNIST)
-		output size is 10x3x3
-		'''
-		def __init__(self):
-			nn.Module.__init__(self)
-			self.convol = nn.Sequential(
-            nn.BatchNorm2d(1),
-            nn.Conv2d(1, 8, kernel_size=7),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-            nn.BatchNorm2d(8),
-            nn.Conv2d(8, 10, kernel_size=5),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-			)
-			self.os=0
-
-		def forward(self,x):
-			x = self.convol(x)	
-			if (self.os==0):
-				self.os=1
-				for i in range(1,len(x.size())):
-					self.os*=x.size()[i]
-			x=x.view(-1,self.os)		
-			return x
-			
-	class Convolution_MNIST_14(nn.Module):
-		'''
-		input size is 1x14x14 (MNIST)
-		output size is 
-		'''
-		def __init__(self):
-			nn.Module.__init__(self)
-			self.convol = nn.Sequential(
-            nn.BatchNorm2d(1),
-            nn.Conv2d(1, 8, kernel_size=5),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-            nn.BatchNorm2d(8),
-            nn.Conv2d(8, 10, kernel_size=3),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-			)
-			self.os=0
-
-		def forward(self,x):
-			x = self.convol(x)	
-			if (self.os==0):
-				self.os=1
-				for i in range(1,len(x.size())):
-					self.os*=x.size()[i]
-			x=x.view(-1,self.os)		
-			return x			
-
-	class Convolution_MNIST_56(nn.Module):
-		'''
-		input size is 1x56x56 (MNIST)
-		output size is 10x3x3
-		'''
-		def __init__(self):
-			nn.Module.__init__(self)
-			self.convol = nn.Sequential(
-            nn.BatchNorm2d(1),
-            nn.Conv2d(1, 8, kernel_size=7),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-            nn.BatchNorm2d(8),
-            nn.Conv2d(8, 10, kernel_size=5),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True),
-            nn.BatchNorm2d(10),
-            nn.Conv2d(10, 10, kernel_size=5),
-            nn.MaxPool2d(2, stride=2),
-            nn.ReLU(True)            
-			)
-			self.os=0
-
-		def forward(self,x):
-			x = self.convol(x)
-			if (self.os==0):
-				self.os=1
-				for i in range(1,len(x.size())):
-					self.os*=x.size()[i]
-			x=x.view(-1,self.os)		
-			return x
-
-	class Convolution_COCO_112(nn.Module):
-		'''
-        input size is 1x28x28 (MNIST)
-        output size is 10x3x3
-        '''
-
-		def __init__(self):
-			nn.Module.__init__(self)
-			self.convol = nn.Sequential(
-				nn.BatchNorm2d(3),
-				nn.Conv2d(3, 8, kernel_size=7),
-				nn.MaxPool2d(2, stride=2),
-				nn.ReLU(True),
-				nn.BatchNorm2d(8),
-				nn.Conv2d(8, 10, kernel_size=5),
-				nn.MaxPool2d(2, stride=2),
-				nn.ReLU(True),
-				nn.BatchNorm2d(10),
-				nn.Conv2d(10, 10, kernel_size=5),
-				nn.MaxPool2d(2, stride=2),
-				nn.ReLU(True)
-			)
-			self.os = 0
-
-		def forward(self, x):
-			x = self.convol(x)
-			if (self.os == 0):
-				self.os = 1
-				for i in range(1, len(x.size())):
-					self.os *= x.size()[i]
-			x = x.view(-1, self.os)
-			return x
-
-	image_z=image_size[0]
-	sx=image_size[1]
-	sy=image_size[2]
-	print(image_size)
-	if ((image_z==1) and (sx==28) and (sy==28)):
-		return Convolution_MNIST(),90
-	if ((image_z==1) and (sx==14) and (sy==14)):
-		return Convolution_MNIST_14(),10
-	if ((image_z==1) and (sx==56) and (sy==56)):
-		return Convolution_MNIST_56(),90
-	if ((image_z == 3) and (sx == 112) and (sy == 112)):
-		return Convolution_COCO_112(),1000
-
 
 class STN_Square(nn.Module):
     #Takes a Bx1 localisation + Bx2 translation and returns a Bx2x3 grid
@@ -250,6 +110,130 @@ class Coords_To_Affine(nn.Module):
 
 		return AB
 
+class MNIST28_To_Vector(nn.Module):
+	'''
+	input size is 1x28x28 (MNIST)
+	output size is 90
+	'''
 
+	def __init__(self):
+		nn.Module.__init__(self)
+		self.convol = nn.Sequential(
+		nn.BatchNorm2d(1),
+		nn.Conv2d(1, 8, kernel_size=7),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		nn.BatchNorm2d(8),
+		nn.Conv2d(8, 10, kernel_size=5),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		)
+		self.os = 0
+
+	def forward(self, x):
+		x = self.convol(x)
+		if (self.os == 0):
+			self.os = 1
+			for i in range(1, len(x.size())):
+				self.os *= x.size()[i]
+		x = x.view(-1, self.os)
+		return x
+
+
+class MNIST14_To_Vector(nn.Module):
+	'''
+	input size is 1x14x14 (MNIST)
+	output size is 10
+	'''
+
+	def __init__(self):
+		nn.Module.__init__(self)
+		self.convol = nn.Sequential(
+		nn.BatchNorm2d(1),
+		nn.Conv2d(1, 8, kernel_size=5),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		nn.BatchNorm2d(8),
+		nn.Conv2d(8, 10, kernel_size=3),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		)
+		self.os = 0
+
+	def forward(self, x):
+		x = self.convol(x)
+		if (self.os == 0):
+			self.os = 1
+			for i in range(1, len(x.size())):
+				self.os *= x.size()[i]
+		x = x.view(-1, self.os)
+		return x
+
+
+class MNIST56_To_Vector(nn.Module):
+	'''
+	input size is 1x56x56 (MNIST)
+	output size is 90
+	'''
+
+	def __init__(self):
+		nn.Module.__init__(self)
+		self.convol = nn.Sequential(
+		nn.BatchNorm2d(1),
+		nn.Conv2d(1, 8, kernel_size=7),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		nn.BatchNorm2d(8),
+		nn.Conv2d(8, 10, kernel_size=5),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		nn.BatchNorm2d(10),
+		nn.Conv2d(10, 10, kernel_size=5),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True)
+		)
+		self.os = 0
+
+	def forward(self, x):
+		x = self.convol(x)
+		if (self.os == 0):
+			self.os = 1
+			for i in range(1, len(x.size())):
+				self.os *= x.size()[i]
+		x = x.view(-1, self.os)
+		return x
+	
+class COCO112_To_Vector(nn.Module):
+	'''
+	input size is 1x28x28 (MNIST)
+	output size is 1000
+	'''
+
+	def __init__(self):
+		nn.Module.__init__(self)
+		self.convol = nn.Sequential(
+			nn.BatchNorm2d(3),
+			nn.Conv2d(3, 8, kernel_size=7),
+			nn.MaxPool2d(2, stride=2),
+			nn.ReLU(True),
+			nn.BatchNorm2d(8),
+			nn.Conv2d(8, 10, kernel_size=5),
+			nn.MaxPool2d(2, stride=2),
+			nn.ReLU(True),
+			nn.BatchNorm2d(10),
+			nn.Conv2d(10, 10, kernel_size=5),
+			nn.MaxPool2d(2, stride=2),
+			nn.ReLU(True)
+		)
+		self.os = 0
+
+	def forward(self, x):
+		x = self.convol(x)
+		if (self.os == 0):
+			self.os = 1
+			for i in range(1, len(x.size())):
+				self.os *= x.size()[i]
+		x = x.view(-1, self.os)
+		return x
 	
  

@@ -108,11 +108,11 @@ def load_unsupervised_mnist(size_batches=64,sampling_rate=1.0):
 	
 	logging.info("Creating mini-batches from MNIST")
 	loader = torch.utils.data.DataLoader(
-    datasets.MNIST(root='.', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	datasets.MNIST(root='.', train=True, download=True,
+				   transform=transforms.Compose([
+					   transforms.ToTensor(),
+					   transforms.Normalize((0.1307,), (0.3081,))
+				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	all_examples=[]	
 	for batch_idx, (data, target) in enumerate(loader):
@@ -146,11 +146,11 @@ def load_puzzle_mnist(size_batches=64,sampling_rate=1.0,nb_pieces_x=1,nb_pieces_
 	
 	logging.info("Creating mini-batches from MNIST PUZZLE")
 	loader = torch.utils.data.DataLoader(
-    datasets.MNIST(root='.', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	datasets.MNIST(root='.', train=True, download=True,
+				   transform=transforms.Compose([
+					   transforms.ToTensor(),
+					   transforms.Normalize((0.1307,), (0.3081,))
+				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	all_examples=[]	
 	for batch_idx, (data, target) in enumerate(loader):
@@ -192,7 +192,7 @@ def load_supervised_mnist(size_batches=64, sampling_rate=1.0):
 
 	logging.info("\t%d batches of size %d built" % (len(all_examples), size_batches))
 	return all_examples
-    
+	
 def load_unsupervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 	'''
 	Load batches of numbers from MNIST that are randomly localted in a  black 56x56 image
@@ -200,11 +200,11 @@ def load_unsupervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 	
 	logging.info("Creating mini-batches from MNIST (digit random position)")
 	loader = torch.utils.data.DataLoader(
-    datasets.MNIST(root='.', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	datasets.MNIST(root='.', train=True, download=True,
+				   transform=transforms.Compose([
+					   transforms.ToTensor(),
+					   transforms.Normalize((0.1307,), (0.3081,))
+				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	all_examples=[]	
 	for batch_idx, (data, target) in enumerate(loader):
@@ -227,11 +227,11 @@ def load_supervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 	
 	logging.info("Creating mini-batches from MNIST (digit random position)")
 	loader = torch.utils.data.DataLoader(
-    datasets.MNIST(root='.', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	datasets.MNIST(root='.', train=True, download=True,
+				   transform=transforms.Compose([
+					   transforms.ToTensor(),
+					   transforms.Normalize((0.1307,), (0.3081,))
+				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	all_examples=[]	
 	for batch_idx, (data, target) in enumerate(loader):
@@ -247,7 +247,7 @@ def load_supervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 
 	logging.info("\t%d batches of size %d built"%(len(all_examples),size_batches))
 	return all_examples
-    
+	
 def load_unsupervised_mnist_two_digits(size_batches=64,nb_batches=100,digits=[0,1]):
 	'''
 	Create 56x56 images that contains two 14x14 digits 
@@ -255,12 +255,12 @@ def load_unsupervised_mnist_two_digits(size_batches=64,nb_batches=100,digits=[0,
 	
 	logging.info("Creating mini-batches from MNIST (digit random position)")
 	loader = torch.utils.data.DataLoader(
-    datasets.MNIST(root='.', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.Resize((14,14)),
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,)),
-                   ])), batch_size=size_batches, shuffle=True, num_workers=0)
+	datasets.MNIST(root='.', train=True, download=True,
+				   transform=transforms.Compose([
+					   transforms.Resize((14,14)),
+					   transforms.ToTensor(),
+					   transforms.Normalize((0.1307,), (0.3081,)),
+				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	images={}
 	
@@ -320,12 +320,15 @@ def load_unsupervised_mnist_two_digits(size_batches=64,nb_batches=100,digits=[0,
 		
 
 def sample_batches(batches,proportion):
-    retour=[]
-    for aa in batches:
-        if (random.random()<proportion):
-            retour.append(aa)
+	retour=[]
+	retour2=[]
+	for aa in batches:
+		if (random.random()<proportion):
+			retour.append(aa)
+		else:
+			retour2.append(aa)
 
-    return retour
+	return retour,retour2
 
    
 
