@@ -1,5 +1,45 @@
 import torch.nn as nn
 import torch.nn.init as init 
+from torch.autograd.function import Function, InplaceFunction
+import torch
+
+# straigh through estimator
+class STE(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input):
+        return torch.sign(input)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        return grad_output
+
+# satured straight through estimator
+class SSTE(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input):
+        ctx.saved
+        return torch.sign(input)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        input = ctx.save_for_backward(input)
+        grad_output[input<-1] = 0
+        grad_output[input>1] = 0
+        return grad_output
+
+# stochastic straigh through estimator
+
+class BernoulliGradientEstimator(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input, eps=0):
+        f = (torch.bernoulli(input)*2-1)
+        f[f == -1] = eps
+        return f
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        return grad_output
+
 
 def weight_init(m):
     '''
