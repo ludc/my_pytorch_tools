@@ -230,7 +230,7 @@ def load_supervised_mnist_random_position(size_batches=64,sampling_rate=1.0):
 	datasets.MNIST(root='.', train=True, download=True,
 				   transform=transforms.Compose([
 					   transforms.ToTensor(),
-					   transforms.Normalize((0.1307,), (0.3081,))
+					   #transforms.Normalize((0.1307,), (0.3081,))
 				   ])), batch_size=size_batches, shuffle=True, num_workers=0)
 	
 	all_examples=[]	
