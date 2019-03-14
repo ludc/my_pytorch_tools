@@ -237,3 +237,28 @@ class COCO112_To_Vector(nn.Module):
 		return x
 	
  
+class COCO14_To_Vector(nn.Module):
+	def __init__(self):
+		nn.Module.__init__(self)
+		self.convol = nn.Sequential(
+		nn.BatchNorm2d(3),
+		nn.Conv2d(3, 8, kernel_size=5),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		nn.BatchNorm2d(8),
+		nn.Conv2d(8, 10, kernel_size=3),
+		nn.MaxPool2d(2, stride=2),
+		nn.ReLU(True),
+		)
+		self.os = 0
+
+	def forward(self, x):
+		x = self.convol(x)
+		if (self.os == 0):
+			self.os = 1
+			for i in range(1, len(x.size())):
+				self.os *= x.size()[i]
+		x = x.view(-1, self.os)
+		return x
+	
+ 

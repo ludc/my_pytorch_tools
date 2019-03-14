@@ -26,7 +26,8 @@ def extract_coco_images(cocodir,cocoinstances,categories=[],proportion=1.0):
 	for c in train_dataset.coco.dataset["categories"]:
 		if (c['name'] in categories):
 			CATEGORIES_IDS_TO_KEEP.append(c['id'])
-
+	print(categories)
+	print("TO KEEP = "+str(CATEGORIES_IDS_TO_KEEP))
 	nb_kept=0
 	nb_total=0
 	images=[]
@@ -51,10 +52,8 @@ def extract_coco_images(cocodir,cocoinstances,categories=[],proportion=1.0):
 				images.append((x,ids))
 				print(ids)
 
-
-
 	logging.info("found %d images"%len(images))
-	return(images)
+	return(images,train_dataset.coco.dataset["categories"])
 
 def load_unsupervised_images(images,size_batches=64,nb_batches=10):
 	'''
